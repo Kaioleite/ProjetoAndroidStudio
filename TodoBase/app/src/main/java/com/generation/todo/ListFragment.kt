@@ -13,17 +13,17 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.generation.todo.adapter.TarefaAdapter
+import com.generation.todo.adapter.TaskItemClickListener
 import com.generation.todo.databinding.FragmentFormBinding
 import com.generation.todo.databinding.FragmentListBinding
 import com.generation.todo.mainviewmodel.MainViewModel
 import com.generation.todo.model.Tarefa
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class ListFragment : Fragment() {
+class ListFragment : Fragment(), TaskItemClickListener {
 
     private lateinit var binding: FragmentListBinding
     private val mainViewModel : MainViewModel by activityViewModels ()
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,12 +35,10 @@ class ListFragment : Fragment() {
         binding = FragmentListBinding.inflate(
             layoutInflater, container, false
         )
-
-
         //Configurar o Adapter
 
         //Instaciar o adapter
-        val adapter = TarefaAdapter()
+        val adapter = TarefaAdapter(context, this, mainViewModel)
 
         //Definir o Layout Manager da RecyclerView
         binding.recyclerTarefa.layoutManager = LinearLayoutManager(context)
@@ -53,6 +51,7 @@ class ListFragment : Fragment() {
 
         //Navegação para o Fragment de Form
         binding.floatingAdd.setOnClickListener {
+            mainViewModel.tarefaSelecionada = null
             findNavController().navigate(R.id.action_listFragment_to_formFragment)
         }
 
@@ -63,5 +62,8 @@ class ListFragment : Fragment() {
         })
         return binding.root
     }
-
+    override fun onTaskClicked(tarefa: Tarefa) {
+        mainViewModel.tarefaSelecionada = tarefa
+        findNavController().navigate(R.id.action_listFragment_to_formFragment)
+    }
 }

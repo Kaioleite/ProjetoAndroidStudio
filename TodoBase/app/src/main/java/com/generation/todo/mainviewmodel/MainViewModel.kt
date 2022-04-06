@@ -20,6 +20,8 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     val repository:Repository
     ): ViewModel () {
+
+    var tarefaSelecionada: Tarefa? = null
     private val _responseListCategoria =
         MutableLiveData<Response<List<Categoria>>>()
 
@@ -29,8 +31,8 @@ class MainViewModel @Inject constructor(
     private val _myTarefaResponse =
         MutableLiveData<Response<List<Tarefa>>>()
 
-    val myTarefaReponse:LiveData<Response<List<Tarefa>>> =
-          _myTarefaResponse
+    val myTarefaReponse: LiveData<Response<List<Tarefa>>> =
+        _myTarefaResponse
 
     val dataSelecionada = MutableLiveData<LocalDate>()
 
@@ -60,14 +62,37 @@ class MainViewModel @Inject constructor(
             }
         }
     }
-   fun listTarefas(){
-       viewModelScope.launch {
-       try {
-           val response = repository.listTarefas()
-           _myTarefaResponse.value = response
-       } catch (e: Exception){
-           Log.e("Developer", "Error", e )
-       }
-       }
-   }
+
+    fun listTarefas() {
+        viewModelScope.launch {
+            try {
+                val response = repository.listTarefas()
+                _myTarefaResponse.value = response
+            } catch (e: Exception) {
+                Log.e("Developer", "Error", e)
+            }
+        }
+    }
+
+    fun updateTarefa(tarefa: Tarefa) {
+        viewModelScope.launch {
+            try {
+                repository.updateTarefa(tarefa)
+                listTarefas()
+            } catch (e: Exception) {
+                Log.d("Erro", e.message.toString())
+            }
+        }
+    }
+
+    fun deleteTarefa(id: Long) {
+        viewModelScope.launch {
+            try {
+                repository.deleteTarefa(id)
+                listTarefas()
+            } catch (e: Exception) {
+                Log.d("Erro", e.message.toString())
+            }
+        }
+    }
 }
